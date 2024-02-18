@@ -9,10 +9,10 @@ const cos = new COS({
   SecretKey: process.env.SecretKey,
 });
 // 存储桶名称，由bucketname-appid 组成，appid必须填入，可以在COS控制台查看存储桶名称。 https://console.cloud.tencent.com/cos5/bucket
-const Bucket = 'notion-nice-1253546688';
+const Bucket = 'nice-1253546688';
 // 存储桶Region可以在COS控制台指定存储桶的概览页查看 https://console.cloud.tencent.com/cos5/bucket/
 // 关于地域的详情见 https://cloud.tencent.com/document/product/436/6224
-const Region = 'ap-guangzhou';
+const Region = 'ap-hongkong';
 
 @Injectable()
 export class AppService {
