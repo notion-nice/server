@@ -1,4 +1,13 @@
-import { Controller, Get } from '@nestjs/common';
+import {
+  Controller,
+  UseInterceptors,
+  UploadedFile,
+  Body,
+  Get,
+  Post,
+} from '@nestjs/common';
+import { v4 as uuid } from 'uuid';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { AppService } from './app.service';
 
 @Controller()
@@ -8,5 +17,16 @@ export class AppController {
   @Get()
   getHello(): string {
     return this.appService.getHello();
+  }
+
+  @Post()
+  @UseInterceptors(FileInterceptor('file'))
+  async converter(@UploadedFile() file: File, @Body() body: any) {
+    if (!file) {
+      throw Error('File not found');
+    }
+    const directoryName = body.filename || uuid();
+    const url = await this.appService.converter(file, directoryName);
+    return { url };
   }
 }
