@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { promises as fs } from 'fs';
-import path from 'path';
-import COS = require('cos-nodejs-sdk-v5');
+import * as path from 'path';
+import * as COS from 'cos-nodejs-sdk-v5';
 import { unzip } from 'fflate';
 
 const cos = new COS({
@@ -20,12 +20,13 @@ export class AppService {
     return 'Hello World!';
   }
 
-  async converter(zipData: Uint8Array, directoryName: string) {
-    const outputPath = path.join(__dirname, 'temp', directoryName);
+  async converter(filePath: string, directoryName: string) {
+    console.log('converter', path.join(process.cwd(), filePath));
 
-    await fs.mkdir(outputPath, { recursive: true });
+    const file = await fs.readFile(path.join(process.cwd(), filePath));
+    const zipData = new Uint8Array(file);
 
-    const mdFilePath = await saveFilesFromZip(zipData, outputPath);
+    const mdFilePath = await saveFilesFromZip(zipData, directoryName);
 
     return mdFilePath;
   }
@@ -43,8 +44,9 @@ const asyncUnzip = (input: Uint8Array) =>
     });
   });
 
-async function saveFilesFromZip(buffer: Uint8Array, outputPath: string) {
-  // 确保输出路径存在
+async function saveFilesFromZip(buffer: Uint8Array, directoryName: string) {
+  const outputPath = path.join(__dirname, 'temp', directoryName);
+
   await fs.mkdir(outputPath, { recursive: true });
 
   // 解压缩 Buffer
@@ -66,7 +68,7 @@ async function saveFilesFromZip(buffer: Uint8Array, outputPath: string) {
     const ret = await cos.sliceUploadFile({
       Bucket: Bucket,
       Region: Region,
-      Key: filePath,
+      Key: path.join(directoryName, filename),
       FilePath: filePath,
     });
     if (filename.endsWith('.md')) {

@@ -28,9 +28,8 @@ export class AppController {
     if (!file) {
       throw Error('File not found');
     }
-    const zipData = new Uint8Array(file.buffer);
     const directoryName = body.filename || uuid();
-    const url = await this.appService.converter(zipData, directoryName);
+    const url = await this.appService.converter(file.path, directoryName);
     return { url };
   }
 }
