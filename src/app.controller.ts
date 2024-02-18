@@ -19,7 +19,7 @@ export class AppController {
     return this.appService.getHello();
   }
 
-  @Post()
+  @Post('/api/converter')
   @UseInterceptors(FileInterceptor('file'))
   async converter(@UploadedFile() file: File, @Body() body: any) {
     if (!file) {
