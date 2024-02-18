@@ -57,6 +57,7 @@ async function saveFilesFromZip(buffer: Uint8Array, directoryName: string) {
   for (const filename in unzipped) {
     const fileContent = unzipped[filename];
     const filePath = path.join(outputPath, filename);
+    const fileKey = path.join(directoryName, filename);
 
     // 确保文件路径中的目录存在
     const directoryPath = path.dirname(filePath);
@@ -65,15 +66,15 @@ async function saveFilesFromZip(buffer: Uint8Array, directoryName: string) {
     // 保存文件到磁盘
     await fs.writeFile(filePath, fileContent);
 
-    const ret = await cos.sliceUploadFile({
+    await cos.sliceUploadFile({
       Bucket: Bucket,
       Region: Region,
-      Key: path.join(directoryName, filename),
+      Key: fileKey,
       FilePath: filePath,
     });
     if (filename.endsWith('.md')) {
       // 如果是 Markdown 文件，记录其路径
-      mdFilePath = ret.Location;
+      mdFilePath = fileKey;
     }
   }
 
