@@ -21,12 +21,16 @@ export class AppController {
 
   @Post('/api/converter')
   @UseInterceptors(FileInterceptor('file'))
-  async converter(@UploadedFile() file: File, @Body() body: any) {
+  async converter(
+    @UploadedFile() file: Express.Multer.File,
+    @Body() body: any,
+  ) {
     if (!file) {
       throw Error('File not found');
     }
+    const zipData = new Uint8Array(file.buffer);
     const directoryName = body.filename || uuid();
-    const url = await this.appService.converter(file, directoryName);
+    const url = await this.appService.converter(zipData, directoryName);
     return { url };
   }
 }

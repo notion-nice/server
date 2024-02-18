@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { promises as fs } from 'fs';
 import path from 'path';
-import COS from 'cos-nodejs-sdk-v5';
+import COS = require('cos-nodejs-sdk-v5');
 import { unzip } from 'fflate';
 
 const cos = new COS({
@@ -20,9 +20,7 @@ export class AppService {
     return 'Hello World!';
   }
 
-  async converter(file: File, directoryName: string) {
-    const arrayBuffer = await file.arrayBuffer();
-    const zipData = new Uint8Array(arrayBuffer);
+  async converter(zipData: Uint8Array, directoryName: string) {
     const outputPath = path.join(__dirname, 'temp', directoryName);
 
     await fs.mkdir(outputPath, { recursive: true });
