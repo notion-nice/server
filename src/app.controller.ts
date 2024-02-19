@@ -29,7 +29,6 @@ export class AppController {
       throw Error('File not found');
     }
     const directoryName = body.filename || uuid();
-    const url = await this.appService.converter(file.path, directoryName);
-    return { url };
+    return await this.appService.converter(file.path, directoryName);
   }
 }

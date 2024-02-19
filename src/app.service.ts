@@ -26,9 +26,7 @@ export class AppService {
     const file = await fs.readFile(path.join(process.cwd(), filePath));
     const zipData = new Uint8Array(file);
 
-    const mdFilePath = await saveFilesFromZip(zipData, directoryName);
-
-    return mdFilePath;
+    return await saveFilesFromZip(zipData, directoryName);
   }
 }
 
@@ -53,6 +51,7 @@ async function saveFilesFromZip(buffer: Uint8Array, directoryName: string) {
   const unzipped = await asyncUnzip(buffer);
 
   let mdFilePath: string;
+  let dirPath: string;
 
   for (const filename in unzipped) {
     const fileContent = unzipped[filename];
@@ -74,15 +73,18 @@ async function saveFilesFromZip(buffer: Uint8Array, directoryName: string) {
     });
     if (filename.endsWith('.md')) {
       // 如果是 Markdown 文件，记录其路径
-      mdFilePath = fileKey;
+      mdFilePath = filePath;
+      dirPath = path.dirname(fileKey);
     }
   }
-
-  await fs.rm(outputPath, { recursive: true, force: true });
 
   if (!mdFilePath) {
     throw new Error('Markdown file not found in the ZIP archive');
   }
 
-  return mdFilePath;
+  const mdFileContent = await fs.readFile(mdFilePath, { encoding: 'utf8' });
+
+  await fs.rm(outputPath, { recursive: true, force: true });
+
+  return { content: mdFileContent, url: dirPath };
 }
