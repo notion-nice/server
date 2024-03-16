@@ -57,7 +57,7 @@ export class AppService {
       return md;
     }
     const blocks = markdownToBlocks(md);
-    return blocks;
+    return blocks as any[];
   }
 
   async converterHtmlToBlocks(html: string, toBlock = true) {
@@ -69,7 +69,7 @@ export class AppService {
     }
     // Markdown string to Notion Blocks
     const blocks = markdownToBlocks(markdown);
-    return blocks;
+    return blocks as any[];
   }
 }
 
