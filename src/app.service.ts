@@ -3,6 +3,11 @@ import { promises as fs } from 'fs';
 import * as path from 'path';
 import * as COS from 'cos-nodejs-sdk-v5';
 import { unzip } from 'fflate';
+import { fromHtml } from 'hast-util-from-html';
+import { toMdast } from 'hast-util-to-mdast';
+import { toMarkdown } from 'mdast-util-to-markdown';
+import sitdownConverter from './sitdownConverter';
+import { markdownToBlocks } from '@tryfabric/martian';
 
 const cos = new COS({
   SecretId: process.env.SecretId,
@@ -27,6 +32,44 @@ export class AppService {
     const zipData = new Uint8Array(file);
 
     return await saveFilesFromZip(zipData, directoryName);
+  }
+
+  async htmlToBlocks(html: string, source = 'html', toBlock = true) {
+    let md = sitdownConverter.GFM(html);
+    switch (source) {
+      case 'Juejin':
+        md = sitdownConverter.Juejin(html);
+        break;
+      case 'Zhihu':
+        md = sitdownConverter.Zhihu(html);
+        break;
+      case 'Wechat':
+        md = sitdownConverter.Wechat(html);
+        break;
+      case 'CSDN':
+        md = sitdownConverter.CSDN(html);
+        break;
+
+      default:
+        break;
+    }
+    if (!toBlock) {
+      return md;
+    }
+    const blocks = markdownToBlocks(md);
+    return blocks;
+  }
+
+  async converterHtmlToBlocks(html: string, toBlock = true) {
+    const hast = fromHtml(html, { fragment: true });
+    const mdast = toMdast(hast);
+    const markdown = toMarkdown(mdast);
+    if (!toBlock) {
+      return markdown;
+    }
+    // Markdown string to Notion Blocks
+    const blocks = markdownToBlocks(markdown);
+    return blocks;
   }
 }
 

@@ -31,4 +31,23 @@ export class AppController {
     const directoryName = body.filename || uuid();
     return await this.appService.converter(file.path, directoryName);
   }
+
+  @Post('/api/html2blocks')
+  async html2blocks(
+    @Body('html') html: string,
+    @Body('source') source: string,
+    @Body('to_block') toBlock: boolean,
+  ) {
+    const data = await this.appService.htmlToBlocks(html, source, toBlock);
+    return { ok: true, data };
+  }
+
+  @Post('/api/converter-html2blocks')
+  async converterHtmlToBlocks(
+    @Body('html') html: string,
+    @Body('to_block') toBlock: boolean,
+  ) {
+    const data = await this.appService.converterHtmlToBlocks(html, toBlock);
+    return { ok: true, data };
+  }
 }
